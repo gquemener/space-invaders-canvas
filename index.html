@@ -1,0 +1,98 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <title>Space Invaders</title>
+        <style type="text/css" media="screen">
+            body {margin:0; padding:0}
+            canvas {display: block;}
+        </style>
+        <script type="text/javascript" charset="utf-8">
+            window.onload = function()
+            {
+                var canvas = document.getElementById("c");
+                var ctx    = canvas.getContext("2d");
+                var boxes = [
+                    new Box(0, 0, 50, 100),
+                    new Box(50, 0, 100, 100),
+                    new Box(0, 50, 75, 50)
+                ];
+
+                var W = window.innerWidth,
+                    H = window.innerHeight;
+
+                canvas.width = W;
+                canvas.height = H;
+
+                function Box(_x, _y, _xGoal, _yGoal)
+                {
+                    this.x          = _x;
+                    this.y          = _y;
+                    this.xGoal      = _xGoal;
+                    this.yGoal      = _yGoal;
+                    this.width      = 50;
+                    this.height     = this.width;
+                    this.xVel       = Math.round(Math.random() * 10);
+                    this.yVel       = Math.round(Math.random() * 10);
+                    this.r          = Math.round(Math.random()*255);
+                    this.g          = Math.round(Math.random()*255);
+                    this.b          = Math.round(Math.random()*255);
+                    this.rgba       = "rgba("+this.r+","+this.g+","+this.b+",1)";
+                    this.converge   = false;
+
+                    this.draw = function()
+                    {
+                        ctx.fillStyle = this.rgba;
+                        ctx.fillRect(this.x, this.y, this.width, this.height);
+
+                        this.update();
+                    }
+
+                    this.update = function()
+                    {
+                        this.x += this.xVel
+                        this.y += this.yVel;
+
+                        if (this.x < 0 || this.x > W - this.width)
+                            this.xVel *= -1;
+
+                        if (this.y < 0 || this.y > H - this.height)
+                            this.yVel *= -1;
+
+                        if (this.converge) {
+                            //Stop when we reach the goal
+                            if (this.x == this.xGoal)
+                                this.xVel = 0;
+
+                            if (this.y == this.yGoal)
+                                this.yVel = 0;
+                        }
+                    }
+
+                    this.moveToGoal = function()
+                    {
+                        this.converge = true;
+                        this.xVel = (this.xGoal - this.x) / 10;
+                        this.yVel = (this.yGoal - this.y) / 10;
+
+                    }
+                }
+
+                function draw()
+                {
+                    ctx.fillStyle = "rgba(0,0,0,0.5)"
+                    ctx.fillRect(0,0,W,H);
+
+                    boxes.forEach(function(box){ box.draw(); });
+                }
+
+                setInterval(draw, 30);
+                setInterval(function(){boxes.forEach(function(box){ box.moveToGoal(); })}, 2000);
+            }
+        </script>
+    </head>
+    <body>
+        <canvas id="c"></canvas>
+    </body>
+</html>
+
