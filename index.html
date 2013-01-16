@@ -12,17 +12,23 @@
             {
                 var canvas = document.getElementById("c");
                 var ctx    = canvas.getContext("2d");
-                var boxes = [
-                    new Box(0, 0, 50, 100),
-                    new Box(50, 0, 100, 100),
-                    new Box(0, 50, 75, 50)
-                ];
+                var boxes = [];
+                for (var i=0; i<1000; i++) {
+                    boxes.push(new Box(0, 0,  50,   50));
+                }
 
                 var W = window.innerWidth,
                     H = window.innerHeight;
 
                 canvas.width = W;
                 canvas.height = H;
+                document.body.onclick = function() {
+                    if (boxes.every(function(box) { return !box.converge && box.xVel == 0 && box.yVel == 0; })) {
+                        boxes.forEach(function(box) {
+                            box.init();
+                        });
+                    }
+                }
 
                 function Box(_x, _y, _xGoal, _yGoal)
                 {
@@ -30,15 +36,18 @@
                     this.y          = _y;
                     this.xGoal      = _xGoal;
                     this.yGoal      = _yGoal;
-                    this.width      = 50;
+                    this.width      = 3;
                     this.height     = this.width;
-                    this.xVel       = Math.round(Math.random() * 10);
-                    this.yVel       = Math.round(Math.random() * 10);
-                    this.r          = Math.round(Math.random()*255);
-                    this.g          = Math.round(Math.random()*255);
-                    this.b          = Math.round(Math.random()*255);
-                    this.rgba       = "rgba("+this.r+","+this.g+","+this.b+",1)";
                     this.converge   = false;
+
+                    this.init = function() {
+                        this.xVel       = Math.round(Math.random() * 10);
+                        this.yVel       = Math.round(Math.random() * 10);
+                        this.r          = Math.round(Math.random()*255);
+                        this.g          = Math.round(Math.random()*255);
+                        this.b          = Math.round(Math.random()*255);
+                        this.rgba       = "rgba("+this.r+","+this.g+","+this.b+",1)";
+                    }
 
                     this.draw = function()
                     {
@@ -66,28 +75,33 @@
 
                             if (this.y == this.yGoal)
                                 this.yVel = 0;
+
+                            if (this.xVel == 0 && this.yVel == 0)
+                                this.converge = false;
                         }
                     }
 
                     this.moveToGoal = function()
                     {
                         this.converge = true;
+                        this.rgba = 'pink';
                         this.xVel = (this.xGoal - this.x) / 10;
                         this.yVel = (this.yGoal - this.y) / 10;
 
                     }
+                    this.init();
                 }
 
                 function draw()
                 {
-                    ctx.fillStyle = "rgba(0,0,0,0.5)"
+                    ctx.fillStyle = "rgba(0,0,0,0.5)";
                     ctx.fillRect(0,0,W,H);
 
                     boxes.forEach(function(box){ box.draw(); });
                 }
 
                 setInterval(draw, 30);
-                setInterval(function(){boxes.forEach(function(box){ box.moveToGoal(); })}, 2000);
+                setTimeout(function(){boxes.forEach(function(box){ box.moveToGoal(); })}, 2000);
             }
         </script>
     </head>
